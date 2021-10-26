@@ -80,7 +80,6 @@ while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
 odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
 while (odrv0.axis0.encoder.pos_estimate > CollisionPosition2 + 1):
         pass
-#test
 #odrv0.axis0.controller.input_pos = CollisionPosition1 - 1
 #while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
 #        pass
