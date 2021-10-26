@@ -11,8 +11,6 @@ global Vel1
 global Iq1
 global repeat
 
-
-
 # Find a connected ODrive (this will block until you connect one)
 print("finding an odrive...")
 #odrv0 = odrive.find_any(serial_number=serial1)
@@ -24,7 +22,6 @@ def liveplot():
     odrv0.axis0.encoder.vel_estimate])
 
 liveplot()
-
 
 odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 odrv0.axis0.trap_traj.config.vel_limit = 5
