@@ -84,7 +84,7 @@ print("Axis0 Range  " + '{:.2f}'.format(CollisionPosition1 - CollisionPosition2)
 odrv0.axis0.requested_state = AXIS_STATE_IDLE
 
 while True:
-        key = input ("Select ")
+        key = input ("Select Option ")
         if key == "y":
                 print("Yes")
                 break
