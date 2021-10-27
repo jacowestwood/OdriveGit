@@ -19,7 +19,7 @@ print("odrive found")
 
 def liveplot():
     start_liveplotter(lambda: [
-    odrv0.axis0.encoder.vel_estimate])
+    odrv0.axis0.motor.current_control.Iq_measured])
 
 liveplot()
 
@@ -73,10 +73,17 @@ while True:
 odrv0.axis0.trap_traj.config.vel_limit = 30
 odrv0.axis0.controller.input_pos = CollisionPosition1 - 1
 while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
+        if (odrv0.axis0.motor.current_control.Iq_measured > 3):
+                print("Collision!!!!!!!")
+                break
         pass
-odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
-while (odrv0.axis0.encoder.pos_estimate > CollisionPosition2 + 1):
-        pass
+
+#odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
+#while (odrv0.axis0.encoder.pos_estimate > CollisionPosition2 + 1):
+#        pass
+#odrv0.axis0.controller.move_incremental(-40, False)
+
+
 #odrv0.axis0.controller.input_pos = CollisionPosition1 - 1
 #while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
 #        pass
