@@ -1,15 +1,18 @@
 from __future__ import print_function
+from re import match
 import odrive
 from odrive.utils import start_liveplotter
 from enums import *
 import time
 import math
+import sys
 global M0current
 global CollisionPosition1
 global CollisionPosition2
 global Vel1
 global Iq1
 global repeat
+global key
 
 # Find a connected ODrive (this will block until you connect one)
 print("finding an odrive...")
@@ -77,7 +80,19 @@ while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
                 print("Collision!!!!!!!")
                 break
         pass
+print("Axis0 Range  " + '{:.2f}'.format(CollisionPosition1 - CollisionPosition2))
+odrv0.axis0.requested_state = AXIS_STATE_IDLE
 
+while True:
+        key = input ("Select ")
+        if key == "y":
+                print("Yes")
+                break
+        elif key == "n":
+                print("NO")
+                break
+
+        
 #odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
 #while (odrv0.axis0.encoder.pos_estimate > CollisionPosition2 + 1):
 #        pass
@@ -96,7 +111,6 @@ while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
 #odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
 #while (odrv0.axis0.encoder.pos_estimate > CollisionPosition2 + 1):
 #        pass
-print("Axis0 Range  " + '{:.2f}'.format(CollisionPosition1 - CollisionPosition2))
-odrv0.axis0.requested_state = AXIS_STATE_IDLE
 
 repeat = input ("Repeat?(Y/N)")
+sys.exit()
