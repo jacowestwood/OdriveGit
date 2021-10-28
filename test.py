@@ -18,7 +18,7 @@ global key
 print("finding an odrive...")
 #odrv0 = odrive.find_any(serial_number=serial1)
 odrv0 = odrive.find_any()
-print("odrive found")
+print("odrive !!!")
 
 def liveplot():
     start_liveplotter(lambda: [
