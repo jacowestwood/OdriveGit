@@ -77,7 +77,7 @@ odrv0.axis0.trap_traj.config.vel_limit = 30
 odrv0.axis0.controller.input_pos = CollisionPosition1 - 1
 while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
         if (odrv0.axis0.motor.current_control.Iq_measured > 4):
-                print("Collision!!!!!!!")
+                print("Collision")
                 break
         pass
 print("Axis0 Range  " + '{:.2f}'.format(CollisionPosition1 - CollisionPosition2))
