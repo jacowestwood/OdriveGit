@@ -13,6 +13,7 @@ global Vel1
 global Iq1
 global repeat
 global key
+global CurrentPosition
 
 # Find a connected ODrive (this will block until you connect one)
 print("finding an odrive...")
@@ -76,29 +77,39 @@ while True:
 odrv0.axis0.trap_traj.config.vel_limit = 30
 odrv0.axis0.controller.input_pos = CollisionPosition1 - 1
 while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
+        CurrentPosition = odrv0.axis0.encoder.pos_estimate
         if (odrv0.axis0.motor.current_control.Iq_measured > 4):
                 print("Collision")
                 odrv0.axis0.requested_state = AXIS_STATE_IDLE
                 while odrv0.axis0.current_state != AXIS_STATE_IDLE:
                         time.sleep(0.1)
+                print("IDLE")
                 odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-                odrv0.axis0.controller.input_pos = CollisionPosition2 - 1
+                odrv0.axis0.controller.input_pos = CurrentPosition
+                print("CLOSE LOOP")
+                time.sleep(0.2)
+                odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
+                while ( CurrentPosition > CollisionPosition2 + 1):
+                        time.sleep(0.1)
+                        CurrentPosition = odrv0.axis0.encoder.pos_estimate
+                print("HOME")
                 odrv0.axis0.requested_state = AXIS_STATE_IDLE
                 while odrv0.axis0.current_state != AXIS_STATE_IDLE:
                         time.sleep(0.1)
+                print("IDLE")
                 break
         pass
 print("Axis0 Range  " + '{:.2f}'.format(CollisionPosition1 - CollisionPosition2))
 odrv0.axis0.requested_state = AXIS_STATE_IDLE
 
-while True:
-        key = input ("Select Option ")
-        if key == "y":
-                print("Yes")
-                break
-        elif key == "n":
-                print("NO")
-                break
+#while True:
+#        key = input ("Select Option ")
+#        if key == "y":
+#                print("Yes")
+#                break
+#        elif key == "n":
+#                print("NO")
+#                break
 
         
 #odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
@@ -120,5 +131,5 @@ while True:
 #while (odrv0.axis0.encoder.pos_estimate > CollisionPosition2 + 1):
 #        pass
 
-repeat = input ("Repeat?(Y/N)")
+#repeat = input ("Repeat?(Y/N)")
 sys.exit()
