@@ -79,6 +79,13 @@ while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
         if (odrv0.axis0.motor.current_control.Iq_measured > 4):
                 print("Collision")
                 odrv0.axis0.requested_state = AXIS_STATE_IDLE
+                while odrv0.axis0.current_state != AXIS_STATE_IDLE:
+                        time.sleep(0.1)
+                odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+                odrv0.axis0.controller.input_pos = CollisionPosition2 - 1
+                odrv0.axis0.requested_state = AXIS_STATE_IDLE
+                while odrv0.axis0.current_state != AXIS_STATE_IDLE:
+                        time.sleep(0.1)
                 break
         pass
 print("Axis0 Range  " + '{:.2f}'.format(CollisionPosition1 - CollisionPosition2))
