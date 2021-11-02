@@ -6,6 +6,7 @@ from enums import *
 import time
 import math
 import sys
+import keyboard
 global M0current
 global CollisionPosition1
 global CollisionPosition2
@@ -21,11 +22,11 @@ print("finding an odrive...")
 odrv0 = odrive.find_any()
 print("odrive found!!!")
 
-def liveplot():
-    start_liveplotter(lambda: [
-    odrv0.axis0.motor.current_control.Iq_measured])
-
-liveplot()
+#def liveplot():
+#    start_liveplotter(lambda: [
+#    odrv0.axis0.motor.current_control.Iq_measured])
+#
+#liveplot()
 
 odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 odrv0.axis0.trap_traj.config.vel_limit = 5
@@ -80,24 +81,45 @@ while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
         CurrentPosition = odrv0.axis0.encoder.pos_estimate
         if (odrv0.axis0.motor.current_control.Iq_measured > 4):
                 print("Collision")
+                odrv0.axis0.controller.input_pos = CurrentPosition - 1
                 odrv0.axis0.requested_state = AXIS_STATE_IDLE
-                while odrv0.axis0.current_state != AXIS_STATE_IDLE:
+                while (odrv0.axis0.current_state != AXIS_STATE_IDLE):
                         time.sleep(0.1)
                 print("IDLE")
                 odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-                odrv0.axis0.controller.input_pos = CurrentPosition
+                #odrv0.axis0.controller.input_pos = CurrentPosition - 1
                 print("CLOSE LOOP")
-                time.sleep(0.2)
+                time.sleep(0.1)
                 odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
                 while ( CurrentPosition > CollisionPosition2 + 1):
                         time.sleep(0.1)
                         CurrentPosition = odrv0.axis0.encoder.pos_estimate
                 print("HOME")
                 odrv0.axis0.requested_state = AXIS_STATE_IDLE
-                while odrv0.axis0.current_state != AXIS_STATE_IDLE:
+                while (odrv0.axis0.current_state != AXIS_STATE_IDLE):
                         time.sleep(0.1)
                 print("IDLE")
                 break
+        if keyboard.read_key() == "r":
+            CurrentPosition = odrv0.axis0.encoder.pos_estimate
+            odrv0.axis0.requested_state = AXIS_STATE_IDLE
+            while (odrv0.axis0.current_state != AXIS_STATE_IDLE):
+                        time.sleep(0.1)
+            odrv0.axis0.controller.input_pos = CurrentPosition
+            odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+            #time.sleep(5)
+            odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+            
+            odrv0.axis0.controller.input_pos = CurrentPosition
+            time.sleep(5)
+            
+            #time.sleep(0.1)
+            odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
+            CurrentPosition = odrv0.axis0.encoder.pos_estimate
+            while (CurrentPosition > CollisionPosition2 + 1):
+                        time.sleep(0.1)
+                        CurrentPosition = odrv0.axis0.encoder.pos_estimate
+            break
         pass
 print("Axis0 Range  " + '{:.2f}'.format(CollisionPosition1 - CollisionPosition2))
 odrv0.axis0.requested_state = AXIS_STATE_IDLE
