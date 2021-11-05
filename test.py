@@ -7,14 +7,24 @@ import time
 import math
 import sys
 import keyboard
+import threading
 global M0current
 global CollisionPosition1
 global CollisionPosition2
 global Vel1
 global Iq1
 global repeat
-global key
+global keypressed
 global CurrentPosition
+
+
+consoleBuffer = []
+
+def consoleInput(myBuffer):
+  while True:
+    myBuffer.append(input())
+ 
+threading.Thread(target=consoleInput, args=(consoleBuffer,)).start() # start the thread
 
 # Find a connected ODrive (this will block until you connect one)
 print("finding an odrive...")
@@ -24,11 +34,14 @@ print("odrive found!!!")
 
 #def liveplot():
 #    start_liveplotter(lambda: [
-#    odrv0.axis0.motor.current_control.Iq_measured])
-#
+#            odrv0.axis0.encoder.pos_estimate])
+    #odrv0.axis0.motor.current_control.Iq_measured])
+
 #liveplot()
 
 odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+odrv0.axis0.controller.config.pos_gain = 10
+odrv0.axis0.trap_traj.config.decel_limit = 200 
 odrv0.axis0.trap_traj.config.vel_limit = 5
 odrv0.axis0.controller.move_incremental(100, False)
 Pos1 = odrv0.axis0.encoder.pos_estimate                
@@ -75,83 +88,70 @@ while True:
                 odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
                 time.sleep(0.2)
                 break
-odrv0.axis0.trap_traj.config.vel_limit = 30
-odrv0.axis0.controller.input_pos = CollisionPosition1 - 1
-while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
-        CurrentPosition = odrv0.axis0.encoder.pos_estimate
-        if (odrv0.axis0.motor.current_control.Iq_measured > 4):
-                print("Collision")
-                odrv0.axis0.controller.input_pos = CurrentPosition - 1
-                odrv0.axis0.requested_state = AXIS_STATE_IDLE
-                while (odrv0.axis0.current_state != AXIS_STATE_IDLE):
-                        time.sleep(0.1)
-                print("IDLE")
-                odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-                #odrv0.axis0.controller.input_pos = CurrentPosition - 1
-                print("CLOSE LOOP")
-                time.sleep(0.1)
+odrv0.axis0.trap_traj.config.vel_limit = 20
+while True:
+        #key = 0
+        #while consoleBuffer:
+        #        print(repr(consoleBuffer.pop(0)))
+        #key = keyboard.read_key(True)
+        #if consoleBuffer:
+        #        print("Open Pressed")
+                #keypress = repr(consoleBuffer.pop(0))
+        if keyboard.is_pressed('o'):
+                print("Open Pressed")
+                odrv0.axis0.controller.input_pos = CollisionPosition1 - 2
+                while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 2):
+                        CurrentPosition = odrv0.axis0.encoder.pos_estimate
+                        if (odrv0.axis0.motor.current_control.Iq_measured > 4):
+                                print("Collision")
+                                odrv0.axis0.controller.input_pos = CurrentPosition - 1
+                                odrv0.axis0.requested_state = AXIS_STATE_IDLE
+                                while (odrv0.axis0.current_state != AXIS_STATE_IDLE):
+                                        time.sleep(0.1)
+                                print("IDLE")
+                                odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+                                #odrv0.axis0.controller.input_pos = CurrentPosition - 1
+                                print("CLOSE LOOP")
+                                time.sleep(0.1)
+                                odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
+                                while ( CurrentPosition > CollisionPosition2 + 1):
+                                        time.sleep(0.1)
+                                        CurrentPosition = odrv0.axis0.encoder.pos_estimate
+                                print("HOME")
+                                odrv0.axis0.requested_state = AXIS_STATE_IDLE
+                                while (odrv0.axis0.current_state != AXIS_STATE_IDLE):
+                                        time.sleep(0.1)
+                                print("IDLE")
+                                break
+                        if keyboard.is_pressed('c'): keyboard.release
+                                print("c Pressed")
+                                CurrentPosition = odrv0.axis0.encoder.pos_estimate
+                                odrv0.axis0.controller.input_vel = 0
+                                odrv0.axis0.controller.config.control_mode = CONTROL_MODE_VELOCITY_CONTROL
+                                odrv0.axis0.controller.input_vel = 0
+                                print("Control Mode " + '{:.2f}'.format(odrv0.axis0.controller.config.control_mode))
+                                #time.sleep(0.1)
+
+                                #odrv0.axis0.requested_state = AXIS_STATE_IDLE
+                                #while (odrv0.axis0.current_state != AXIS_STATE_IDLE):
+                                #            time.sleep(0.05)
+                                #odrv0.axis0.controller.input_pos = CurrentPosition
+                                #odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+                                #odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+                                #time.sleep(.1)
+                                #odrv0.axis0.controller.input_pos = CurrentPosition
+                                #time.sleep(.1)
+                                #time.sleep(0.1)
+                                odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
+                                CurrentPosition = odrv0.axis0.encoder.pos_estimate
+                                while (CurrentPosition > CollisionPosition2 + 1):
+                                        time.sleep(0.1)
+                                        CurrentPosition = odrv0.axis0.encoder.pos_estimate
+                                break
+        elif keyboard.is_pressed('c'):
+                print("Close Pressed")
                 odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
-                while ( CurrentPosition > CollisionPosition2 + 1):
-                        time.sleep(0.1)
-                        CurrentPosition = odrv0.axis0.encoder.pos_estimate
-                print("HOME")
-                odrv0.axis0.requested_state = AXIS_STATE_IDLE
-                while (odrv0.axis0.current_state != AXIS_STATE_IDLE):
-                        time.sleep(0.1)
-                print("IDLE")
-                break
-        if keyboard.read_key() == "r":
-            CurrentPosition = odrv0.axis0.encoder.pos_estimate
-            odrv0.axis0.requested_state = AXIS_STATE_IDLE
-            while (odrv0.axis0.current_state != AXIS_STATE_IDLE):
-                        time.sleep(0.1)
-            odrv0.axis0.controller.input_pos = CurrentPosition
-            odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-            #time.sleep(5)
-            odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-            
-            odrv0.axis0.controller.input_pos = CurrentPosition
-            time.sleep(5)
-            
-            #time.sleep(0.1)
-            odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
-            CurrentPosition = odrv0.axis0.encoder.pos_estimate
-            while (CurrentPosition > CollisionPosition2 + 1):
-                        time.sleep(0.1)
-                        CurrentPosition = odrv0.axis0.encoder.pos_estimate
-            break
-        pass
+
 print("Axis0 Range  " + '{:.2f}'.format(CollisionPosition1 - CollisionPosition2))
 odrv0.axis0.requested_state = AXIS_STATE_IDLE
-
-#while True:
-#        key = input ("Select Option ")
-#        if key == "y":
-#                print("Yes")
-#                break
-#        elif key == "n":
-#                print("NO")
-#                break
-
-        
-#odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
-#while (odrv0.axis0.encoder.pos_estimate > CollisionPosition2 + 1):
-#        pass
-#odrv0.axis0.controller.move_incremental(-40, False)
-
-
-#odrv0.axis0.controller.input_pos = CollisionPosition1 - 1
-#while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
-#        pass
-#odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
-#while (odrv0.axis0.encoder.pos_estimate > CollisionPosition2 + 1):
-#        pass
-#odrv0.axis0.controller.input_pos = CollisionPosition1 - 1
-#while (odrv0.axis0.encoder.pos_estimate < CollisionPosition1 - 1):
-#        pass
-#odrv0.axis0.controller.input_pos = CollisionPosition2 + 1
-#while (odrv0.axis0.encoder.pos_estimate > CollisionPosition2 + 1):
-#        pass
-
-#repeat = input ("Repeat?(Y/N)")
 sys.exit()
