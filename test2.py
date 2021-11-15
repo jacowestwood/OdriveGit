@@ -34,7 +34,7 @@ odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 while True:
         if keyboard.is_pressed('o'):
             print("Open Pressed")
-            odrv0.axis0.controller.input_pos = 100
+            odrv0.axis0.controller.input_pos = 40
         if keyboard.is_pressed('c'):
             print("Close Pressed")
             odrv0.axis0.controller.config.input_mode = INPUT_MODE_PASSTHROUGH
@@ -42,16 +42,23 @@ while True:
             time.sleep(0.5)
             odrv0.axis0.controller.config.input_mode = INPUT_MODE_TRAP_TRAJ
             odrv0.axis0.controller.input_pos = 0
-        if keyboard.is_pressed('z'):
-            print("Close2 Pressed")
+        if keyboard.is_pressed('v'):
+            print("Close2 Pressedovov")
             odrv0.axis0.controller.config.control_mode = CONTROL_MODE_VELOCITY_CONTROL
             odrv0.axis0.controller.config.input_mode = INPUT_MODE_PASSTHROUGH
             odrv0.axis0.controller.input_vel = 0
             #time.sleep(0.1)
-            odrv0.axis0.controller.input_pos = 0
-            odrv0.axis0.controller.config.control_mode = CONTROL_MODE_POSITION_CONTROL
-            odrv0.axis0.controller.config.input_mode = INPUT_MODE_TRAP_TRAJ
+            odrv0.axis0.controller.input_pos = odrv0.axis0.encoder.pos_estimate
             #odrv0.axis0.controller.input_pos = 0
+            odrv0.axis0.controller.config.input_mode = INPUT_MODE_TRAP_TRAJ
+            odrv0.axis0.controller.config.control_mode = CONTROL_MODE_POSITION_CONTROL
+            odrv0.axis0.controller.input_pos = 0
+        if keyboard.is_pressed('i'):
+            odrv0.axis0.requested_state = AXIS_STATE_IDLE
+        if keyboard.is_pressed('l'):
+            odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL    
+        if keyboard.is_pressed('z'):
+            odrv0.axis0.encoder.set_linear_count(0)
         if keyboard.is_pressed('r'):
             print("Reboot Pressed")
             odrv0.reboot()
