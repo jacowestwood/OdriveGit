@@ -35,6 +35,17 @@ while True:
         if keyboard.is_pressed('o'):
             print("Open Pressed")
             odrv0.axis0.controller.input_pos = 40
+        if keyboard.is_pressed('p'):
+            print("Open2 Pressed")
+            odrv0.axis0.controller.config.control_mode = CONTROL_MODE_VELOCITY_CONTROL
+            odrv0.axis0.controller.config.input_mode = INPUT_MODE_PASSTHROUGH
+            odrv0.axis0.controller.input_vel = 0
+            #time.sleep(0.1)
+            odrv0.axis0.controller.input_pos = odrv0.axis0.encoder.pos_estimate
+            #odrv0.axis0.controller.input_pos = 0
+            odrv0.axis0.controller.config.input_mode = INPUT_MODE_TRAP_TRAJ
+            odrv0.axis0.controller.config.control_mode = CONTROL_MODE_POSITION_CONTROL
+            odrv0.axis0.controller.input_pos = 40
         if keyboard.is_pressed('c'):
             print("Close Pressed")
             odrv0.axis0.controller.config.input_mode = INPUT_MODE_PASSTHROUGH
@@ -43,7 +54,7 @@ while True:
             odrv0.axis0.controller.config.input_mode = INPUT_MODE_TRAP_TRAJ
             odrv0.axis0.controller.input_pos = 0
         if keyboard.is_pressed('v'):
-            print("Close2 Pressedovov")
+            print("Close2 Pressed")
             odrv0.axis0.controller.config.control_mode = CONTROL_MODE_VELOCITY_CONTROL
             odrv0.axis0.controller.config.input_mode = INPUT_MODE_PASSTHROUGH
             odrv0.axis0.controller.input_vel = 0
